@@ -42,6 +42,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -130,13 +132,20 @@ class MainActivity : ComponentActivity() {
                 reverseLayout = true
             ) {
                 itemsIndexed(chatState.chatList) { index, chat ->
-                    if (chat.isFromUser) {
-                        chat.bitmap?.let { UserChatItem(prompt = chat.prompt, bitmap = it) }
+                    if (chat.bitmap != null) {
+                        UserChatItem(prompt = chat.prompt, bitmap = chat.bitmap)
                     } else {
                         ModelChatItem(response = chat.prompt)
                     }
                 }
+
+                item {
+                    if (chatState.isSubmit) {
+                        UserChatItem(prompt = chatState.prompt, bitmap = bitmap)
+                    }
+                }
             }
+
 
             Row(
                 modifier = Modifier
@@ -193,16 +202,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-//                            bitmap
-//                                ?.let {
-//                                    UiEvents.SendPrompt(
-//                                        chatState.prompt,
-//                                        it
-//                                    )
-//                                }
-//                                ?.let { chatViewModel.onEvent(it) }
-//                            uriState.update { "" }
-                            chatViewModel.onEvent(UiEvents.SendPrompt(chatState.prompt, null))
+                            chatViewModel.onEvent(UiEvents.SendPrompt(chatState.prompt, bitmap))
                             chatViewModel.onEvent(UiEvents.UpdatePrompt(""))
                             uriState.update { "" }
                         },
@@ -252,7 +252,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ModelChatItem(response: String) {
         Column(
-            modifier = Modifier.padding(start = 100.dp, bottom = 22.dp)
+            modifier = Modifier.padding(end = 70.dp, bottom = 22.dp)
         ) {
             Text(
                 modifier = Modifier

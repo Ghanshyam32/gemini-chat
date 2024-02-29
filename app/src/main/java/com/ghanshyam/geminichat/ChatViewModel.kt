@@ -1,6 +1,7 @@
 package com.ghanshyam.geminichat
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,8 @@ class ChatViewModel : ViewModel() {
         when (events) {
             is UiEvents.SendPrompt -> {
                 if (events.prompt.isNotEmpty()) {
-                    events.bitmap?.let { addPrompt(events.prompt, it) }
-                    //addPrompt(events.prompt, events.bitmap)
+//                    events.bitmap?.let { addPrompt(events.prompt, it) }
+                    addPrompt(events.prompt, events.bitmap)
                     if (events.bitmap != null) {
                         getImageResponse(events.prompt, events.bitmap)
                     } else {
@@ -38,16 +39,21 @@ class ChatViewModel : ViewModel() {
     }
 
     private fun addPrompt(prompt: String, bitmap: Bitmap?) {
-        _chatState.update {
-            it.copy(
-                chatList = it.chatList.toMutableList().apply {
-                    bitmap?.let { it1 -> Chat(prompt, it1, true) }?.let { it2 -> add(0, it2) }
-                },
-                prompt = "",
-                bitmap = null
-            )
+        if (prompt.isNotEmpty() || bitmap != null) {
+            _chatState.update {
+                it.copy(
+                    chatList = it.chatList.toMutableList().apply {
+                        add(0, Chat(prompt, bitmap, true))
+                    },
+                    prompt = "",
+                    bitmap = null
+                )
+            }
         }
     }
+
+
+
 
     private fun getResponse(prompt: String) {
         viewModelScope.launch {

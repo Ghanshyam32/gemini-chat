@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 
 object Api {
 
-    val key = "api-key"
+    val key = "your-api-key"
 
 
     //for text input
@@ -26,7 +26,7 @@ object Api {
                 prompt = response.text ?: "error",
                 bitmap = null, isFromUser = false
             )
-        } catch (e: ResponseStoppedException) {
+        } catch (e: Exception) {
             return Chat(
                 prompt = e.message ?: "error",
                 bitmap = null,
